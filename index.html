@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Agent Call Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #00d4ff;
+            --text-main: #e0e0e0;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --border: #333;
+            --note-bg: #2a2a2a;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Rebuttal Sidebar */
+        .rebuttal-sidebar {
+            width: 400px;
+            background-color: var(--card-bg);
+            border-left: 2px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rebuttal-btn {
+            width: 100%;
+            text-align: left;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #252525;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .rebuttal-btn:hover { border-color: var(--accent); background: #333; }
+
+        .rebuttal-display {
+            height: 320px;
+            background: #0a0a0a;
+            border: 1px solid var(--accent);
+            padding: 20px;
+            border-radius: 10px;
+            overflow-y: auto;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .tabs { display: flex; gap: 15px; margin-bottom: 25px; }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: #2d2d2d;
+            border: 1px solid var(--border);
+            color: #aaa;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .tab-btn.active { background: var(--accent); color: #000; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Script Cards */
+        .script-step {
+            display: none;
+            margin-bottom: 25px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .script-step.visible { display: block; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .rep-note {
+            background-color: var(--note-bg);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #bbb;
+        }
+
+        .rep-note strong { color: var(--accent); display: block; margin-bottom: 5px; }
+
+        .btn-group { display: flex; gap: 15px; margin-top: 20px; }
+        .btn { padding: 12px 35px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .btn-yes { background-color: var(--success); color: white; }
+        .btn-no { background-color: var(--danger); color: white; }
+
+        .stop-notifier {
+            background-color: #3b0a0a;
+            border: 2px solid #ff4444;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 12px;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('mca-intake')">MCA INTAKE</button>
+            <button class="tab-btn" onclick="switchTab('callback')">CALL BACK</button>
+            <button class="tab-btn" onclick="switchTab('atty-ref')">ATTORNEY REFERRAL</button>
+        </div>
+
+        <div id="mca-intake" class="tab-content active">
+            <div class="script-step visible" id="mca-1">
+                <div class="card">
+                    <p><strong>Agent:</strong> Thank you for calling the Claims Department at MyClaimAssist, this is [Name]. Is this a new or an existing claim?</p>
+                    <div class="btn-group">
+                        <button class="btn btn-yes" onclick="showNext('mca-2')">NEW CLAIM</button>
+                        <button class="btn btn-no" onclick="showStop('mca-stop-exist')">EXISTING CLAIM</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mca-2" class="script-step">
+                <div class="card">
+                    <p><strong>Agent:</strong> Before we proceed, let me ask you the following questions to check and make sure that we can handle and process your claim. Are you the At-fault person or did someone hit your vehicle?</p>
+                    <div class="btn-group">
+                        <button class="btn btn-yes" onclick="showNext('mca-3')">SOMEONE HIT ME</button>
+                        <button class="btn btn-no" onclick="showStop('mca-stop-fault')">I AM AT-FAULT</button>
+                    </div>
+                    <div class="rep-note">
+                        <strong>REP INSTRUCTION:</strong>
+                        If the caller is at fault, do not continue. Use the red stop button script. [cite: 5]
+                    </div>
+                </div>
+            </div>
+
+            <div id="mca-3" class="script-step">
+                <div class="card">
+                    <p><strong>Agent:</strong> May I have the full name of the vehicle owner? (If you are speaking to the Vehicle owner, proceed.)<br>
+                    1. Can you give me the VIN number please? <br>
+                    2. What is the current mileage of your vehicle?<br>
+                    3. What is the best phone number for the vehicle owner?<br>
+                    4. What is your home address?<br>
+                    5. Have you already spoken with an attorney regarding this matter<br>
+                    6. Which insurance company is handling your claim?<br>
+                    7. What is the date of the accident?<br>
+                    8. What is your email address?</p>
+                    
+                    <div class="rep-note">
+                        <strong>REP INSTRUCTION:</strong>
+                        Search the VIN on <a href="https://www.jdpower.com" target="_blank">Jdpower</a>. If not found, use epicvin or clearvin. Confirm Year/Make/Model once found.
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-yes" onclick="showNext('mca-4')">PROCEED TO ACCIDENT DETAILS</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mca-4" class="script-step">
+                <div class="card">
+                    <p>Were you or anyone involved injured in the accident?</p>
+                    <div class="btn-group">
+                        <button class="btn btn-yes" onclick="showNext('mca-inj')">YES (INJURED)</button>
+                        <button class="btn btn-no" onclick="showNext('mca-final')">NO INJURIES</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mca-inj" class="script-step">
+                <div class="card">
+                    <p><strong>Agent:</strong> I'm sorry to hear that.<br>
+                        How many individuals were injured?<br>
+                        May I have their full names?<br>
+                        What are the phone numbers of the injured individuals?<br>
+                        Was a police report filed for the accident?<br>
+                        Who was at fault in the accident?<br>
+                        May I have the full name of the at-fault party?<br>
+                        What is the phone number of the at-fault party?<br>
+                        Could you please provide a bried description of how the accident occurred?</p>
+                    <div class="rep-note">
+                        <strong>REP INSTRUCTION:</strong>
+                        Push for an attorney referral if they mention any pain or soreness.
+                    </div>
+                    <button class="btn btn-yes" onclick="showNext('mca-final')">CONTINUE</button>
+                </div>
+            </div>
+
+            <div id="mca-final" class="script-step">
+                <div class="card">
+                    <p><strong>Agent:</strong> Thank you for providing that information. Your reference number is [REFERENCE ID] . Also, please keep an eye on your email, as an automated message will be sent within 24 to 48 hours. This email will contain all the details related to your claim, including the contact information of your assigned adjuster. From there, you may reach out directly to State Farm to speak with the representative handling your claim and address any questions or concerns you may have. If you have any questions in the future, please call our Customer Support line at 855-361-3414. We appreciate your time today. Thank you </p>
+                    <div class="rep-note">
+                        <strong>REP INSTRUCTION:</strong>
+                       •	Send e-sign agreements- LOR and Limited Authorization through Panda Docs e-sign is sent, Signed and completed. Change the Intake Stage to Claims Registration.<br>
+                       Request supporting documents must be submitted as soon as possible. Ensure all received documents are uploaded and attached in the Attachments section on the right side of the record.<br>
+• Police report <br>
+• Photos of the accident and vehicle damage <br>
+• Photos of the at-fault driver’s insurance card 
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="mca-stop-exist" class="stop-notifier" style="display:none;"><strong>Transfer Script:</strong> "I’ll connect you with our Processing Team who can address your status. Please stay on the line." [cite: 75]</div>
+            <div id="mca-stop-fault" class="stop-notifier" style="display:none;"><strong>Closing Script:</strong> "Unfortunately, we only process claims for the non-at-fault party. Thank you for your time." [cite: 5]</div>
+        </div>
+
+        <div id="callback" class="tab-content">
+            <div class="card">
+                <p>"Hello this is [Name]. You recently reached out regarding an auto accident claim and I’m returning your call. Were you able to get assistance already?" [cite: 36]</p>
+                <div class="btn-group">
+                    <button class="btn btn-no" onclick="showNext('cb-new')">NO (STILL NEED HELP)</button>
+                    <button class="btn btn-yes" onclick="showNext('cb-done')">YES (ALREADY HELPED)</button>
+                </div>
+            </div>
+            
+            <div id="cb-new" class="script-step">
+                <div class="card">
+                    <p>"Okay, we can absolutely help you get that started. I just need to gather a few basic details." [cite: 38]</p>
+                    <div class="rep-note"><strong>REP INSTRUCTION:</strong> Switch to the MCA Intake tab to proceed. [cite: 39]</div>
+                </div>
+            </div>
+
+            <div id="cb-done" class="script-step">
+                <div class="card">
+                    <p>"Understood. Just to confirm — were you injured in the accident?" [cite: 41, 42]</p>
+                    <div class="btn-group">
+                        <button class="btn btn-yes" onclick="switchTab('atty-ref')">YES (GO TO ATTY REFERRAL)</button>
+                        <button class="btn btn-no" onclick="showStop('cb-end')">NO</button>
+                    </div>
+                </div>
+            </div>
+            <div id="cb-end" class="stop-notifier" style="display:none;">"Thank you for confirming. If you need anything else, feel free to reach back out." [cite: 44]</div>
+        </div>
+
+        <div id="atty-ref" class="tab-content">
+            <div class="card">
+                <p>"Just to confirm, were you injured in the accident?</p>
+                <div class="btn-group">
+                    <button class="btn btn-yes" onclick="showNext('ar-1')">YES</button>
+                </div>
+            </div>
+            <div id="ar-1" class="script-step">
+                <div class="card">
+                    <p>"I’m going to connect you to the Legal intake center now. They’ll go over next steps with you. Please stay on the line." [cite: 105, 107]</p>
+                    <div class="rep-note"><strong>REP INSTRUCTION:</strong> Create a Deal in HubSpot (Pipeline: Attorney Referral) and initiate a Cold Transfer. [cite: 91, 104]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rebuttal-sidebar">
+        <h3 style="text-align: center; color: var(--accent); margin-top: 0;">REBUTTAL BANK</h3>
+        <div class="rebuttal-menu">
+            <button class="rebuttal-btn" onclick="setReb('ins')">"Are you the Insurance Co?"</button>
+            <button class="rebuttal-btn" onclick="setReb('fee')">"Why the $899 fee?"</button>
+            <button class="rebuttal-btn" onclick="setReb('docs')">"What are these agreements?"</button>
+            <button class="rebuttal-btn" onclick="setReb('car')">"Can I get a rental car?"</button>
+            <button class="rebuttal-btn" onclick="setReb('wait')">"What is my status?"</button>
+        </div>
+        <div id="reb-box" class="rebuttal-display">Select a rebuttal to see the script.</div>
+    </div>
+
+    <script>
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function showNext(id) { document.getElementById(id).classList.add('visible'); }
+
+        function showStop(id) {
+            document.querySelectorAll('.stop-notifier').forEach(n => n.style.display = 'none');
+            const el = document.getElementById(id);
+            el.style.display = 'block';
+            el.classList.add('visible');
+        }
+
+        function setReb(key) {
+            const box = document.getElementById('reb-box');
+            const s = {
+                'ins': "<strong>Are you the Insurance?</strong><br>'No, we’re a specialized claims service. We work with the at-fault insurance to help you recover Diminished Value. We only get paid if we successfully recover money for you.' [cite: 50, 52]",
+                'fee': "<strong>$899 Total Loss Fee:</strong><br>'Total Loss claims require separate research and market comps to get you fair value. We don't get a % like Diminished Value, so this fee covers that expert administrative work.' [cite: 65, 67, 70]",
+                'docs': "<strong>Agreements:</strong><br>'The LOR gives us permission to talk to the insurance co for you. The Limited Auth lets us appraise the vehicle to prove your lost value.' [cite: 86, 87]",
+                'car': "<strong>Rental Car:</strong><br>'You can get one on your own, but it’s only covered if the other insurance accepts 100% liability.' [cite: 61, 63]",
+                'wait': "<strong>Status:</strong><br>'A processor is being assigned while we finalize docs. The insurance carrier is establishing liability before they reach out.' [cite: 59, 60]"
+            };
+            box.innerHTML = s[key];
+        }
+    </script>
+</body>
+</html>
