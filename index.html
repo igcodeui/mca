@@ -17,6 +17,15 @@
             --secondary: #444;
             --special: #fbc02d;
         }
+                .header {
+            border-bottom: 2px solid var(--mca);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-dark);
+            z-index: 10;
+        }
 
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
@@ -55,6 +64,9 @@
 <body>
 
     <div class="main-container">
+                <div class="header">
+            <h2 style="margin:0; color: var(--mca);">MCA INTERACTIVE SCRIPT</h2>
+        </div>
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('mca-intake')">MCA INTAKE</button>
             <button class="tab-btn" onclick="switchTab('callback')">CALL BACK</button>
@@ -159,7 +171,7 @@
             </div>
 
             <div id="mca-stop-exist" class="script-step"><div class="card"><p>Instruction: Check existing record in Hubspot.</p></div></div>
-            <div id="mca-stop-fault" class="script-step"><div class="card"><p><strong>Agent:</strong> "Unfortunately, we are unable to assist with at-fault claims at this time."</p></div></div>
+            <div id="mca-stop-fault" class="script-step"><div class="card"><p><strong>Agent:</strong> "Unfortunately, we are unable to assist you at this time."</p></div></div>
         </div>
 
         <div id="callback" class="tab-content">
@@ -176,7 +188,7 @@
                 <div class="card">
                     <button class="btn-back" onclick="undo('cb-no')">← GO BACK</button>
                     <p><strong>Agent:</strong> Okay, we can absolutely help you get that started. I just need to gather a few basic details about the accident.</p>
-                    <div class="rep-instruction">(Proceed with claim intake.)</div>
+                    <div class="rep-instruction">(Proceed with claim intake.)<button class="btn btn-yes" onclick="switchTab('mca-intake')">MCA INTAKE</button></div>
                 </div>
             </div>
             <div id="cb-yes" class="script-step">
